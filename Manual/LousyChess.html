@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Lousy Chess — Keep Talking and Nobody Explodes Module</title>
+    <meta name="viewport" content="initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+    <script src="js/ktane-utils.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Chess Regular';
+            font-style: normal;
+            font-weight: normal;
+            src: local('Chess Regular'), url('font/CHEQ_TT.woff') format('woff');
+        }
+
+        table {
+            margin: 1em auto;
+        }
+
+        .chess-diagram {
+            float: right;
+            line-height: 1rem;
+            font-size: 1rem;
+            border: none;
+        }
+
+        .chess-diagram td {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .chess-diagram .board {
+            font-family: 'Chess Regular';
+            line-height: 2rem;
+            font-size: 2rem;
+        }
+
+    </style>
+</head>
+<body>
+<div class="section">
+    <div class="page page-bg-01">
+        <div class="page-header">
+            <span class="page-header-doc-title">Keep Talking and Nobody Explodes Mod</span>
+            <span class="page-header-section-title">Lousy Chess</span>
+        </div>
+        <div class="page-content">
+            <img src="img/Component/LousyChess.svg" class="diagram">
+            <h2>On the Subject of Lousy Chess</h2>
+            <p class="flavour-text">It’s like playing random moves. Only worse.</p>
+
+            <p>Two lousy <a href="https://www.chess.com/learn-how-to-play-chess">chess</a> engines are playing against
+                each other. It’s up to you to predict their moves. The game is
+                already in progress. Keep playing moves until the game comes to a conclusion.<br></p>
+            <table class="chess-diagram">
+                <tr>
+                    <td>6</td>
+                    <td colspan="5" rowspan="6" class="board">
+                        <table>
+                            <tr>
+                                <td>l</td>
+                                <td>W</td>
+                                <td>n</td>
+                                <td>J</td>
+                                <td>t</td>
+                            </tr>
+                            <tr>
+                                <td>O</td>
+                                <td>o</td>
+                                <td>O</td>
+                                <td>o</td>
+                                <td>O</td>
+                            </tr>
+                            <tr>
+                                <td>.</td>
+                                <td>+</td>
+                                <td>.</td>
+                                <td>+</td>
+                                <td>.</td>
+                            </tr>
+                            <tr>
+                                <td>+</td>
+                                <td>.</td>
+                                <td>+</td>
+                                <td>.</td>
+                                <td>+</td>
+                            </tr>
+                            <tr>
+                                <td>p</td>
+                                <td>P</td>
+                                <td>p</td>
+                                <td>P</td>
+                                <td>p</td>
+                            </tr>
+                            <tr>
+                                <td>R</td>
+                                <td>h</td>
+                                <td>B</td>
+                                <td>q</td>
+                                <td>K</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>a</td>
+                    <td>b</td>
+                    <td>c</td>
+                    <td>d</td>
+                    <td>e</td>
+                </tr>
+            </table>
+            <p>The variant played is <a href="http://wiki.cs.pdx.edu/mc-howto/rules.html" target="_blank">MinitChess</a>.
+                It’s played on a 5&times;4 board with less pieces — see diagram. Bishops have the additional
+                option of moving to any adjacent <b>empty</b> square, allowing them to change color. Furthermore there
+                is
+            </p>
+            <ul>
+                <li>no castling,</li>
+                <li>no double pawn moves,</li>
+                <li>no draw by repetition or moves after capture,</li>
+                <li>pawn promotion only to queen,</li>
+                <li>no “check” or “stalemate”,</li>
+                <li>victory by king capture,</li>
+                <li>victory when an opponent has no legal move,</li>
+                <li>and draw after 40 moves by each side.</li>
+            </ul>
+            <h3>The engines</h3>
+            <p>Every engine follows these steps to determine their next move: </p>
+            <ul>
+                <li>If you can capture the enemy king, do so. Victory!</li>
+                <li>Otherwise, determine the move(s) that meet the goal.</li>
+                <li>If there’s only one, that’s the next move.</li>
+                <li>If there are more than one, use the RNG explained below to determine which piece will move. And
+                    again
+                    to determine where it will move to.
+                </li>
+                <li>If there are none, continue to the next goal.</li>
+                <li>If no goals can be met, the goal is any valid move.</li>
+            </ul>
+            <p>RNG: n = <b>seed</b> + <b>current move</b> (both mentioned on the module). Count n valid moves that meet
+                the goal, ordered alphabetically by starting location, then target location. (The very first possible
+                move would be <b>a1-a2</b>, the last move would be <b>e6-e5</b>). Loop back to the first move if you
+                reached the last valid move.</p>
+            <p>Distance is measured in straight lines. E.g. the distance between the queens in starting position is 7,
+                between the kings is 9.</p>
+            <p>Where it reads "move" in the engine goals, capturing is evenly valid.</p>
+            <table>
+                <tr>
+                    <th>The king must die!</th>
+                    <td>- Move a piece closer to the enemy king.</td>
+                </tr>
+                <tr>
+                    <th>White is lava!</th>
+                    <td>- Move a piece from a white tile to a black tile.<br>
+                        - Move a piece from a black tile to another
+                        black tile.
+                    </td>
+                </tr>
+                <tr>
+                    <th>Black is lava!</th>
+                    <td>- Move a piece from a black tile to a white tile.<br>
+                        - Move a piece from a white tile to another white tile.
+                    </td>
+                </tr>
+                <tr>
+                    <th>Queens wild (or rook/bishop/knight)</th>
+                    <td>- Move the queen (or rook/bishop/knight)</td>
+                </tr>
+                <tr>
+                    <th>We got this all wrong</th>
+                    <td>- Move a piece closer to the starting position of the enemy</td>
+                </tr>
+                <tr>
+                    <th>Mirror, mirror</th>
+                    <td>- Mirror the last move of the opponent using point reflection on the center of the board with
+                        the same piece as the opponent.<br>
+                        - Move the same piece as the opponent.
+                    </td>
+                </tr>
+            </table>
+            <div class="page-footer relative-footer">Page 1 of 2</div>
+        </div>
+    </div>
+</body>
+</html>
