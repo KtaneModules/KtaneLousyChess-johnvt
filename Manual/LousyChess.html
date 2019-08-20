@@ -138,7 +138,8 @@
                     <td class="border">e</td>
                 </tr>
             </table>
-            <p>The variant played is <a href="http://wiki.cs.pdx.edu/mc-howto/rules.html" target="_blank">MinitChess</a>.</p>
+            <p>The variant played is <a href="http://wiki.cs.pdx.edu/mc-howto/rules.html" target="_blank">MinitChess</a>.
+            </p>
             <ul>
                 <li>Smaller board with less pieces — see diagram.</li>
                 <li>Bishops can also move to an adjacent <b>empty</b> square, allowing them to change color.</li>
@@ -158,25 +159,33 @@
         </div>
         <div class="page-content">
             <h3>The engines</h3>
-            <p>Every engine follows these steps to determine their next move: </p>
+            <p>Every engine follows these steps to determine their next move:</p>
             <ul>
                 <li>If you can capture the enemy king, do so. Victory!</li>
                 <li>Otherwise, determine the move(s) that meet the goal.</li>
                 <li>If there’s only one, that’s the next move.</li>
                 <li>If there are more than one, use the RNG explained below to determine which piece will move. And
-                    again
-                    to determine where it will move to.
+                    again to determine where it will move to.
                 </li>
                 <li>If there are none, continue to the next goal.</li>
                 <li>If no goals can be met, the goal is any valid move.</li>
             </ul>
-            <p>RNG: n = <b>seed</b> + <b>current move</b> (both mentioned on the module). Count n valid moves that meet
-                the goal, ordered alphabetically by starting location, then target location. (The very first possible
-                move would be <b>a1-a2</b>, the last move would be <b>e6-e5</b>). Loop back to the first move if you
-                reached the last valid move.</p>
+            <p>Where it reads "move" in the engine goals, capturing is evenly valid.</p>
+            <h3>RNG (random number generator)</h3>
+            <ul>
+                <li>Add the <b>seed</b> of the engine to the <b>current move</b>, both mentioned on the module. Take the
+                    least significant (rightmost) number. Let’s call this <b>n</b>.
+                </li>
+                <li>Scan all squares alphabetically (a1, a2, ..., e5, e6). Starting at 0, count <b>n</b> pieces you come
+                    across that can make one or more valid moves that meet the goal. Loop back to the first piece if
+                    needed. The piece you end on is making the move.
+                </li>
+                <li>Scan all squares alphabetically (a1, a2, ..., e5, e6). Starting at 0, count <b>n</b> target squares you come
+                    across that the piece can make a valid move to that meets the goal. Loop back to the first target square if
+                    needed. The square you end on is the move target.</li>
+            </ul>
             <p>Distance is measured in straight lines. E.g. the distance between the queens in starting position is 7,
                 between the kings is 9.</p>
-            <p>Where it reads "move" in the engine goals, capturing is evenly valid.</p>
             <table>
                 <tr>
                     <th>The king must die</th>
