@@ -173,13 +173,11 @@
             <p>Where it reads "move" in the engine goals, capturing is evenly valid.</p>
             <h3>RNG (random number generator)</h3>
             <ul>
-                <li>Add the <b>seed</b> of the engine to the <b>current move</b>, both mentioned on the module. Take the
-                    least significant (rightmost) number. Let’s call this <b>n</b>.
-                </li>
-                <li>Scan all squares alphabetically (a1, a2, ..., e5, e6). Starting at 0, count <b>n</b> pieces you come
-                    across that can make one or more valid moves that meet the goal. Loop back to the first piece if
-                    needed. The piece you end on is making the move.
-                </li>
+                <li>Define <b>n</b> by adding the rightmost digit of the <b>current move</b> to the <b>seed</b> of the engine (both visible on the module).</li>
+                <li>List all pieces that can make one or more valid moves that meet the current goal by their current square. Order them alphabetically. E.g. <b>b2, d2</b>.</li>
+                <li>The piece that will make a move is the <b>n</b>th one in the list. Wrapping around back to the top if needed.</li>
+                <li>List all valid moves that meet the current goal in the format <b>from-to</b> (e.g. <b>b2-b3</b>).</li>
+                <li>Order them alphabetically.</li>
                 <li>Scan all squares alphabetically (a1, a2, ..., e5, e6). Starting at 0, count <b>n</b> target squares you come
                     across that the piece can make a valid move to that meets the goal. Loop back to the first target square if
                     needed. The square you end on is the move target.</li>
