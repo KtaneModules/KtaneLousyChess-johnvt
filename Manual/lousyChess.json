@@ -1,0 +1,15 @@
+{
+  "Author": "Groover",
+  "Compatibility": "Compatible",
+  "DefuserDifficulty": "VeryHard",
+  "Description": "Two lousy chess engines are playing against each other. It’s up to you to predict their moves and finish the game.",
+  "ExpertDifficulty": "Easy",
+  "ModuleID": "lousyChess",
+  "Name": "Lousy Chess",
+  "Origin": "Mods",
+  "Published": "2019-09-19",
+  "SortKey": "LOUSYCHESS",
+  "SourceUrl": "https://github.com/johnvt/KtaneLousyChess",
+  "SteamID": "1866367885",
+  "Type": "Regular"
+}
