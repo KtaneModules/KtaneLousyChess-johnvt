@@ -32,3 +32,5 @@ Assets/Generated
 Gen
 
 .idea
+.vscode/launch.json
+.vscode/settings.json

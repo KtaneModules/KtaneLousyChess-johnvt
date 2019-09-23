@@ -30,6 +30,14 @@ public class LousyChess : MonoBehaviour
     {
         _moduleId = _moduleIdCounter++;
 
+
+        // This is for debugging:
+        // _game = new Game { BombNumber = "0", WhiteEngine = new LetsSwitchSides(), BlackEngine = new LetsSwitchSides() };
+        // _game.Board = new StringBuilder("..........5.....0.............");
+        // _game.WhiteEngine.Init(Player.White, 0, _game.BombNumber);
+        // _game.BlackEngine.Init(Player.Black, 0, _game.BombNumber);
+        // _game.WhiteEngine.Move(_game);
+
         for (int i = 0; i < 30; i++)
         {
             var j = i;
@@ -39,7 +47,7 @@ public class LousyChess : MonoBehaviour
 
         Button.OnInteract += delegate () { SwitchPieces(); return false; };
 
-        string serial = "CH3SS5";// Bomb.GetSerialNumber();
+        string serial = Bomb.GetSerialNumber();
         var sb = new StringBuilder();
         foreach (var c in serial)
             sb.Append((c >= '0' && c <= '9') ? (c - '0') : (c - 'A' + 1));
