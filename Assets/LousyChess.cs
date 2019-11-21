@@ -275,7 +275,7 @@ public class LousyChess : MonoBehaviour
 
     //Twitch Plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square is empty, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
+    private readonly string TwitchHelpMessage = @"Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square can't be selected, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
     #pragma warning restore 414
 
     public IEnumerator TwitchHandleForcedSolve()
