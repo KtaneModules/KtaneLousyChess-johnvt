@@ -328,6 +328,7 @@ public class LousyChess : MonoBehaviour
 
         if (inputType == 1)
         {
+            yield return null;
             Button.OnInteract();
             yield return new WaitForSeconds(0.1f);
         }
