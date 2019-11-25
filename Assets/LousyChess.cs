@@ -1,10 +1,12 @@
-﻿using Assets;
+using Assets;
 using Engines;
 using KModkit;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class LousyChess : MonoBehaviour
@@ -269,5 +271,88 @@ public class LousyChess : MonoBehaviour
         selectables.Add(Button);
         Module.Children = selectables.ToArray();
         Module.UpdateChildren();
+    }
+
+    //Twitch Plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square can't be selected, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
+    #pragma warning restore 414
+
+    public IEnumerator TwitchHandleForcedSolve()
+    {
+        while(!_solved)
+        {
+            if (_game.NextAction == NextAction.WhiteFrom || _game.NextAction == NextAction.BlackFrom)
+            {
+                _squares[_game.Moves[(_game.CurrentMove)].From].OnInteract();
+            }
+            else if (_game.NextAction == NextAction.WhiteTo || _game.NextAction == NextAction.BlackTo)
+            {
+                _squares[_game.Moves[_game.CurrentMove].To].OnInteract();
+            }
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    public IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] parameters = command.Split(' ');
+        int inputType = 0;
+        /* Validating the command */
+        if (Regex.IsMatch(parameters[0], @"^\s*switch\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
+        {
+            inputType = 1;
+        }
+        else if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            for (int i = 1; i < parameters.Length; i++)
+            {
+                if (Regex.IsMatch(parameters[i], @"^\s*[a-e][1-6]\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+                {
+                    parameters[i] = parameters[i].Trim();
+                    parameters[i] = parameters[i].ToLowerInvariant();
+                }
+                else
+                {
+                    yield return "sendtochaterror Coordinates must be in the format [Alphabet][Digit] where Alphabet is English alphabet from A - E and Digit is a single number 1 - 6.";
+                    yield break;
+                }
+            }
+            inputType = 2;
+        }
+        else
+        {
+            yield return "sendtochaterror The command must be started with \"switch\" or \"press\". \"switch\" must not be followed by any other letter or number.";
+            yield break;
+        }
+
+        if (inputType == 1)
+        {
+            yield return null;
+            Button.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        else if (inputType == 2)
+        {
+            var position = new int[parameters.Length - 1];
+
+            for (int i = 1; i < parameters.Length; i++)
+            {
+                position[i - 1] = (parameters[i][0] - 'a') + (5 * (5 - (parameters[i][1] - '1')));
+            }
+
+            yield return null;
+
+            for (int i = 0; i < position.Length; i++)
+            {
+                if (Module.Children.Any(selectable => selectable == _squares[position[i]]))
+                {
+                    _squares[position[i]].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+        }
+        
+        yield break;
     }
 }
