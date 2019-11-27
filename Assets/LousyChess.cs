@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -275,7 +276,7 @@ public class LousyChess : MonoBehaviour
 
     //Twitch Plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square can't be selected, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
+    private readonly string TwitchHelpMessage = @"Use !{0} highlight to highlight all possible spaces that can be selected. Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square is empty, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
     #pragma warning restore 414
 
     public IEnumerator TwitchHandleForcedSolve()
@@ -298,8 +299,57 @@ public class LousyChess : MonoBehaviour
     {
         string[] parameters = command.Split(' ');
         int inputType = 0;
+
         /* Validating the command */
-        if (Regex.IsMatch(parameters[0], @"^\s*switch\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
+        if (Regex.IsMatch(parameters[0], @"^\s*highlight\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
+		{
+            int count = 0;
+            foreach (var k in _squares)
+            {
+                if (Module.Children.Any(selectable => selectable == k))
+                    count++;
+            }
+
+            MethodInfo[] highlightMethodArray = new MethodInfo[count];
+            object[] enumValue = new object[count];
+
+            int i = 0;
+
+            yield return null;
+
+            foreach (var k in _squares)
+			{
+                if (Module.Children.Any(selectable => selectable == k))
+                {
+                    var l = k.Highlight.GetComponent("Highlightable");
+                    highlightMethodArray[i] = null;
+                    var e = l.GetType().GetNestedType("HighlightTypeEnum", BindingFlags.Public);
+                    highlightMethodArray[i] = l.GetType().GetMethod("On", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(bool), e }, null);
+                    enumValue[i] = Enum.ToObject(e, 1);
+                    highlightMethodArray[i].Invoke(l, new[] { true, enumValue[i] });
+                    i++;
+                }
+            }
+
+            yield return new WaitForSeconds(1f);
+
+            i = 0;
+
+            foreach (var k in _squares)
+            {
+                if (Module.Children.Any(selectable => selectable == k))
+                {
+                    var l = k.Highlight.GetComponent("Highlightable");
+                    highlightMethodArray[i].Invoke(l, new[] { false, enumValue[i] });
+                    i++;
+                }
+            }
+
+            yield return new WaitForSeconds(0.1f);
+            yield break;
+		}
+
+        else if (Regex.IsMatch(parameters[0], @"^\s*switch\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
         {
             inputType = 1;
         }
@@ -322,7 +372,7 @@ public class LousyChess : MonoBehaviour
         }
         else
         {
-            yield return "sendtochaterror The command must be started with \"switch\" or \"press\". \"switch\" must not be followed by any other letter or number.";
+            yield return "sendtochaterror The command must be started with \"highlight\", \"switch\", or \"press\". \"highlight\" or \"switch\" must not be followed by any other letter or number.";
             yield break;
         }
 
