@@ -4,6 +4,7 @@ using KModkit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -275,7 +276,7 @@ public class LousyChess : MonoBehaviour
 
     //Twitch Plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square can't be selected, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
+    private readonly string TwitchHelpMessage = @"Use !{0} highlight to highlight all possible spaces that can be selected. Use !{0} Press A2 B5 C4 to select the squares at A2, B5, and C4 in chess coordinates. (If they are selectable.) If the square can't be selected, the module will do nothing and will process the subsequent squares. Use !{0} switch to switch between full and flat chess set.";
     #pragma warning restore 414
 
     public IEnumerator TwitchHandleForcedSolve()
@@ -297,11 +298,45 @@ public class LousyChess : MonoBehaviour
     public IEnumerator ProcessTwitchCommand(string command)
     {
         string[] parameters = command.Split(' ');
-        int inputType = 0;
-        /* Validating the command */
-        if (Regex.IsMatch(parameters[0], @"^\s*switch\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
+        if (Regex.IsMatch(parameters[0], @"^\s*highlight\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
         {
-            inputType = 1;
+            yield return null;
+
+            //This may not work in testharness. Halting the command in Unity Editor.
+            if (Application.isEditor) yield break;
+
+            //Using Reflections to have game display the highlight.
+            MethodInfo highlightMethod = null;
+            object enumValue = null;
+
+            var highlights = Module.Children.Where(km => km != Button).Select(km => km.Highlight.GetComponent("Highlightable")).ToArray();
+
+            if (highlights.Length == 0) yield break;
+
+            if(highlightMethod == null)
+            {
+                var e = highlights[0].GetType().GetNestedType("HighlightTypeEnum", BindingFlags.Public);
+                highlightMethod = highlights[0].GetType().GetMethod("On", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { typeof(bool), e }, null);
+                enumValue = Enum.ToObject(e, 1);
+            }
+            
+            foreach (var o in highlights)
+            {
+                highlightMethod.Invoke(o, new[] { true, enumValue });
+            }
+
+            yield return new WaitForSeconds(1f);
+
+            foreach (var o in highlights)
+            {
+                highlightMethod.Invoke(o, new[] { false, enumValue });
+            }
+        }
+        else if (Regex.IsMatch(parameters[0], @"^\s*switch\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && parameters.Length == 1)
+        {
+            yield return null;
+            Button.OnInteract();
+            yield return new WaitForSeconds(0.1f);
         }
         else if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
@@ -318,22 +353,6 @@ public class LousyChess : MonoBehaviour
                     yield break;
                 }
             }
-            inputType = 2;
-        }
-        else
-        {
-            yield return "sendtochaterror The command must be started with \"switch\" or \"press\". \"switch\" must not be followed by any other letter or number.";
-            yield break;
-        }
-
-        if (inputType == 1)
-        {
-            yield return null;
-            Button.OnInteract();
-            yield return new WaitForSeconds(0.1f);
-        }
-        else if (inputType == 2)
-        {
             var position = new int[parameters.Length - 1];
 
             for (int i = 1; i < parameters.Length; i++)
@@ -352,7 +371,11 @@ public class LousyChess : MonoBehaviour
                 }
             }
         }
-        
+        else
+        {
+            yield return "sendtochaterror The command must be started with \"switch\" or \"press\". \"switch\" must not be followed by any other letter or number.";
+            yield break;
+        }
         yield break;
     }
 }
