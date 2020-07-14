@@ -16,8 +16,9 @@ MonoBehaviour:
   author: Groover
   description: "Regular module for Keep Talking and Nobody Explodes.\n\nTwo lousy
     chess engines are playing against each other. It\u2019s up to you to predict their
-    moves and finish the game.\n\nThanks to suckerpinch for the Youtube video that
-    inspired me: https://youtu.be/DpXy041BIlA\n\nModule ID: lousyChess"
+    moves and finish the game.\nManual: https://ktane.timwi.de/HTML/Lousy%20Chess.html\n\nThanks
+    to suckerpinch for the Youtube video that inspired me: https://youtu.be/DpXy041BIlA\n\nModule
+    ID: lousyChess"
   version: 1.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: b4152ba2051c14743883c7ca67a0d48b, type: 3}
